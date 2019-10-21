@@ -7,7 +7,7 @@ Desenvolvimento do backend de uma aplicação para o gerenciamento de uma academ
 
 **Node 10.16.3**
 
-**Instalação - Basta executar yarn, aguarde baixar as dependencias e utilize yarn run dev para iniciar localmente o projeto
+**Instalação - Basta executar yarn, aguarde baixar as dependencias e utilize yarn run dev para iniciar localmente o projeto**
 
 
 ### Ferramentas
