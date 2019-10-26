@@ -4,7 +4,7 @@ import Student from '../models/Student';
 
 class StudentsController {
   async store(req, res) {
-    // validações para os campos
+    // validations for the fields
     const schema = Yup.object().shape({
       name: Yup.string().required(),
       email: Yup.string()
@@ -15,11 +15,11 @@ class StudentsController {
       height: Yup.string().required(),
     });
 
-    // se a validação não estiver valida
+    // if validation is not valid
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validations fails' });
     }
-    // pegando um unico estudante pelo email (unico)
+    // getting a single student by email
     const studentsExists = await Student.findOne({
       where: { email: req.body.email },
     });
