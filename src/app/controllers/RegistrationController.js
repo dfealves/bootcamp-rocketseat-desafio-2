@@ -4,9 +4,11 @@ import Registration from '../models/Registration';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 
+import Mail from '../../lib/Mail';
+
 class RegistrationController {
   async store(req, res) {
-    // validação para os campos
+    // validation for fields
     const schema = Yup.object().shape({
       start_date: Yup.date().required(),
       student_id: Yup.number().required(),
@@ -35,17 +37,40 @@ class RegistrationController {
     const end_date = addMonths(startDate, isPlan.duration);
     const RegPrice = isPlan.price * isPlan.duration;
 
-    // getting a single registration
+    const { studentId } = req.params;
+    const registration = await Registration.findByPk(studentId, {
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['title', 'price', 'duration'],
+        },
+      ],
+    });
 
-    const registration = await Registration.create({
-      ...req.body,
+    // getting a single registration
+    const { name, email } = await Student.findOne({
+      where: { id: req.body.student_id },
+    });
+    const registry = await Registration.create({
       student_id,
       plan_id,
       start_date: startDate,
       end_date,
       price: RegPrice,
     });
-    return res.json(registration);
+
+    await Mail.sendMail({
+      to: `${name} <${email}>`,
+      subject: 'Welcome to GymPoint!!!',
+    });
+
+    return res.json(registry);
   }
 }
 
