@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 import Plan from '../models/Plan';
 
 class PlanController {
+  // validating the fields
   async store(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string().required(),
@@ -23,6 +24,7 @@ class PlanController {
       return res.status(400).json({ error: 'Plan already exists' });
     }
 
+    // creating a new plan
     const { id, title, duration, price } = await Plan.create(req.body);
 
     return res.json({
@@ -33,6 +35,7 @@ class PlanController {
     });
   }
 
+  // updating a plan
   async update(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string(),
@@ -71,22 +74,38 @@ class PlanController {
     });
   }
 
+  // listing all plans
   async index(req, res) {
     const plans = await Plan.findAll(req.body.title);
 
     return res.json(plans);
   }
 
+  // delete a plan by id
   async delete(req, res) {
-    const { id } = req.params;
-    const plan = await Plan.findByPk(id);
+    const plan = await Plan.findByPk(req.params.id);
 
     if (!plan) {
       return res.status(400).json({ error: 'Plan does not exists' });
     }
 
-    return res.json(plan);
+    try {
+      await plan.destroy();
+      return res.status(200).json({ message: 'Plan deleted successfully' });
+    } catch (error) {
+      return res.status(400).json({ error: 'Delete failed' });
+    }
   }
+
+  // async delete(req, res) {
+  //   const plan = await Plan.findByPk(req.params.id);
+
+  //   if (!plan) {
+  //     return res.status(400).json({ error: 'Plan does not exists' });
+  //   }
+  //   await plan.destroy();
+  //   res.status(200).json('Plan deleted');
+  // }
 }
 
 export default new PlanController();
