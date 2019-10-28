@@ -5,7 +5,8 @@ import Registration from '../models/Registration';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 
-import Mail from '../../lib/Mail';
+import RegistrationMail from '../jobs/RegistrationMail';
+import Queue from '../../lib/Queue';
 
 class RegistrationController {
   async store(req, res) {
@@ -69,18 +70,8 @@ class RegistrationController {
       price: regPrice,
     });
 
-    await Mail.sendMail({
-      to: `${name} <${email}>`,
-      subject: `Welcome ${name} to GymPoint!!!`,
-      template: 'registration',
-      context: {
-        student: name,
-        plan: title,
-        price: price.toFixed(2),
-        end_date: format(end_date, "'dia' dd 'de' MMMM', às' H:mm'h'", {
-          locale: pt,
-        }),
-      },
+    await Queue.add(RegistrationMail.key, {
+      registration,
     });
 
     return res.json(registry);
@@ -101,7 +92,7 @@ class RegistrationController {
       return res.status(400).json({ error: 'Registration does not exists' });
     }
 
-    const { student_id, plan_id, start_date } = await Registration.update(
+    const { student_id, plan_id, start_date } = await registration.update(
       req.body
     );
 
@@ -115,7 +106,7 @@ class RegistrationController {
   async index(req, res) {
     const registration = await Registration.findAll({
       where: {
-        cancelled_at: null,
+        canceled_at: null,
       },
       include: [
         {
@@ -134,6 +125,16 @@ class RegistrationController {
     if (!registration) {
       return res.status(401).json({ message: 'Registry not found' });
     }
+
+    return res.json(registration);
+  }
+
+  async delete(req, res) {
+    const registration = await Registration.findByPk(req.params.id);
+
+    await registration.update({
+      canceled_at: new Date(),
+    });
 
     return res.json(registration);
   }
