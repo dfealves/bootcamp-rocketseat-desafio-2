@@ -71,7 +71,11 @@ class RegistrationController {
     });
 
     await Queue.add(RegistrationMail.key, {
-      registration,
+      name,
+      email,
+      title,
+      price,
+      end_date,
     });
 
     return res.json(registry);

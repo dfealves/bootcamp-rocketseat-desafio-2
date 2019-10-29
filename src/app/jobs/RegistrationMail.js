@@ -8,7 +8,7 @@ class RegistrationMail {
   }
 
   async handle({ data }) {
-    const { registration } = data;
+    const { name, email, title, price, end_date } = data;
 
     console.log('A fila executou');
 

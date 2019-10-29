@@ -56,12 +56,12 @@ class StudentsController {
       return res.status(400).json({ error: 'Validations fails' });
     }
     // capturando o id que será enviado como parametro
-    const { id } = req.params;
+    const student_id = req.params.studentId;
     // capturando o email que esta no corpo da requisição
     const { email } = req.body;
 
     // capiturando o id do studant pela chave primaria do banco
-    const student = await Student.findByPk(id);
+    const student = await Student.findByPk(student_id);
     // se o studant não existir cairá no if e sera exibido erro
     if (!student) {
       return res.status(404).json({ error: 'Student does not exists' });
@@ -81,7 +81,7 @@ class StudentsController {
     const { name, age, weight, height } = await student.update(req.body);
 
     return res.json({
-      id,
+      student_id,
       name,
       email,
       age,
