@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // yup para validar os campos
 import * as Yup from 'yup';
 import Student from '../models/Student';
@@ -56,12 +57,12 @@ class StudentsController {
       return res.status(400).json({ error: 'Validations fails' });
     }
     // capturando o id que será enviado como parametro
-    const student_id = req.params.studentId;
+    const { id } = req.params;
     // capturando o email que esta no corpo da requisição
     const { email } = req.body;
 
     // capiturando o id do studant pela chave primaria do banco
-    const student = await Student.findByPk(student_id);
+    const student = await Student.findByPk(id);
     // se o studant não existir cairá no if e sera exibido erro
     if (!student) {
       return res.status(404).json({ error: 'Student does not exists' });
@@ -79,9 +80,8 @@ class StudentsController {
     }
 
     const { name, age, weight, height } = await student.update(req.body);
-
     return res.json({
-      student_id,
+      id,
       name,
       email,
       age,
