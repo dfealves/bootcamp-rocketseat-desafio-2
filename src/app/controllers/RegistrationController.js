@@ -39,22 +39,6 @@ class RegistrationController {
     const end_date = addMonths(startDate, isPlan.duration);
     const regPrice = isPlan.price * isPlan.duration;
 
-    const { studentId } = req.params;
-    const registration = await Registration.findByPk(studentId, {
-      include: [
-        {
-          model: Student,
-          as: 'student',
-          attributes: ['name', 'email'],
-        },
-        {
-          model: Plan,
-          as: 'plan',
-          attributes: ['title', 'price', 'duration'],
-        },
-      ],
-    });
-
     // getting a single registration
     const { name, email } = await Student.findOne({
       where: { id: req.body.student_id },
@@ -108,10 +92,14 @@ class RegistrationController {
   }
 
   async index(req, res) {
-    const registration = await Registration.findAll({
+    const { page } = req.query;
+
+    const registration = await Registration.finddAll({
       where: {
         canceled_at: null,
       },
+      limit: 20,
+      offset: (page - 1) * 20,
       include: [
         {
           model: Student,
